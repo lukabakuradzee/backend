@@ -11,7 +11,6 @@ const loginLimiter = rateLimit({
       $or: [{ username: identifier }, { email: identifier }],
     });
 
-    
 
     if (user) {
       const mailOptions = {
@@ -24,18 +23,17 @@ const loginLimiter = rateLimit({
               <img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTebPMTK7aGkNZvnM-oiKB8lYC38YGPWG8KrzEB6-9z_mgThEpb" alt="Logo" style="max-width: 150px; margin-bottom: 20px; border-radius: 200px;">
               <p>There have been multiple unsuccessful login attempts to your account. 
               If this wasn't you, please change your password immediately.</p>
-              <p>If this was you, please wait 5 minutes and try again.</p>,
+              <p>If this was you, please wait 5 minutes and try again, or login with OTP</p>,
             </div>
           </div>
           `,
       };
-      console.log("User Email", user.email)
       await sendVerificationEmail(mailOptions);
     }
 
     res.status(429).json({
       message:
-        "Too many login attempts from this IP, please try again after 5 minutes",
+        "Too many uneccessful login attempts from this IP, please try again after 5 minutes",
     });
   },
   standardHeaders: true,

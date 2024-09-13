@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  phoneNumber: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   emailVerified: {
     type: Boolean,
     default: false,
@@ -67,6 +72,16 @@ const userSchema = new mongoose.Schema({
   loginCount: {
     type: Number,
     default: 0,
+  },
+  failedLoginAttempts: {
+    type: Number,
+    default: 0,
+  },
+  otp: {
+    type: String,
+  },
+  otpExpires: {
+    type: Date,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

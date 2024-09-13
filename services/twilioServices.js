@@ -36,10 +36,9 @@ const verifySms = async (to, code) => {
   }
 };
 
-const sendSmsHandler = async (req, res) => {
-  const { to } = req.body;
+const sendSmsHandler = async (phoneNumber) => {
   try {
-    const sms = await sendSms(to);
+    const sms = await sendSms(phoneNumber);
     console.log(`SMS sent successfully: ${JSON.stringify(sms)}`);
     res.status(200).json({
       success: true,
@@ -48,7 +47,6 @@ const sendSmsHandler = async (req, res) => {
     });
   } catch (error) {
     console.error(`Error sending SMS: ${error.message}`);
-    res.status(500).json({ success: false, error: error.message });
   }
 };
 

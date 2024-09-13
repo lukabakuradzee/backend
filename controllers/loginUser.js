@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const User = require("../models/User");
 const dotenv = require("dotenv");
 const sendVerificationEmail = require("./sendVerificationEmail");
+const { sendSmsHandler } = require("../services/twilioServices");
 // const redisClient = require('../config/redisClient')
 
 dotenv.config();
@@ -31,10 +32,7 @@ exports.loginUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update last login and login count
-    user.lastLogin = new Date();
-    user.loginCount += 1;
-    await user.save();
+    
 
     // If resetPassword flag is provided, initiate password reset process
     if (resetPassword) {
@@ -68,11 +66,26 @@ exports.loginUser = async (req, res) => {
     // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      // user.failedLoginAttempts += 1;
+      // await user.save();
+    //   if (user.failedLoginAttempts >= 3) {
+    //     // const smsResponse = await sendSmsHandler(user.phoneNumber);
+    //     // return res.status(401).json({
+    //     //   message:
+    //     //     `Too many failed login attempts, please verify via OTP sent to your phone ${user.phoneNumber} or`,
+    //     //   smsResponse,
+    //     // });
+    //     return res.status(401).json({ message: "Password is incorrect" });
+    //   }
+    // }
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "Password is incorrect" });
     }
-    if(!user || !(await bcrypt.compare(password, user.password))) {
-       return res.status(401).json({ message: "Invalid credentials"})
-    }
+  }
+    // user.failedLoginAttempts = 0;
+    user.lastLogin = Date.now();
+    user.loginCount += 1;
+    await user.save();
 
     const token = jwt.sign(
       {
@@ -83,12 +96,12 @@ exports.loginUser = async (req, res) => {
         lastName: user.lastName,
         age: user.age,
         email: user.email,
+        phoneNumber: user.phoneNumber,
         emailVerified: user.emailVerified,
       },
       process.env.SECRET_KEY,
       { expiresIn: "24h" }
     );
-
 
 
     // Password is correct, return success

@@ -54,7 +54,7 @@ exports.verifyGoogleToken = async (req, res) => {
 
     const payload = ticket.getPayload();
     console.log("PAYLOAD: ", payload)
-    const { sub, email, name, picture } = payload;
+    const { sub, email, name, picture, age, phoneNumber } = payload;
     let user = await User.findOne({ googleId: sub });
 
     const verificationToken = uuid.v4();
@@ -83,7 +83,6 @@ exports.verifyGoogleToken = async (req, res) => {
           password: generateRandomPassword(),
           verificationToken: verificationToken,
           username: email.split("@")[0],
-          age: 0,
         });
 
         await user.save();
@@ -124,6 +123,7 @@ exports.verifyGoogleToken = async (req, res) => {
         lastName: user.lastName,
         age: user.age,
         email: user.email,
+        phone: user.phoneNumber,
         emailVerified: user.emailVerified,
       },
       process.env.SECRET_KEY,

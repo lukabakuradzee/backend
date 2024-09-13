@@ -8,16 +8,22 @@ const sendVerificationEmail = require("./sendVerificationEmail");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { username, name, lastName, age, email, password } = req.body;
+    const { username, name, lastName, age, email, phoneNumber, password } = req.body;
+    console.log("Req body register:" , req.body)
     // Check if username exists
     const existingUser = await User.findOne({ username });
     const existingEmail = await User.findOne({ email });
+    const existingPhoneNumber = await User.findOne({ phoneNumber });
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
     if (existingEmail) {
       return res.status(400).json({ message: "Email already exists" });
+    }
+
+    if(existingPhoneNumber) {
+      return res.status(400).json({message: "Account with this phone number already existed"})
     }
 
     if (!passwordRegex.test(password)) {
@@ -50,6 +56,7 @@ exports.registerUser = async (req, res) => {
       lastName,
       age,
       email,
+      phoneNumber,
       password: hashedPassword,
       verificationToken,
       resetPasswordToken: resetToken,

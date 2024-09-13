@@ -42,7 +42,7 @@ exports.resetPassword = async function (req, res) {
         </div>
       </div>`,
     };
-    // Send email
+    
     await sendVerificationEmail(mailOptions);
 
     res
